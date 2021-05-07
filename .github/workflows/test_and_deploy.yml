@@ -1,0 +1,111 @@
+################################################################################
+# Test and Deployment for Syring Pumps.
+#
+#
+# Author: W.R. Jackson, DAMP/CIDAR Research Engineer, 2021
+################################################################################
+
+on:
+  push:
+    branches:
+      - main
+      - feat/better-ci-and-cd
+
+name: Perform Tests on Available Platforms.
+
+jobs:
+  continuous-integration:
+    name: Perform Tests on Available Platforms
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.8]
+        os: [ubuntu-18.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # -----------------------------------------------------------------------
+      #   Check out the repository and setup our baseline Python environment
+      # -----------------------------------------------------------------------
+      - name: Checkout Syring Pumps Repository
+        uses: actions/checkout@v2
+
+      - name: Set up our requested Python Version
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # -----------------------------------------------------------------------
+      #   Install external tool dependencies like iverilog
+      # -----------------------------------------------------------------------
+      - name: Install Ubuntu Dependencies
+        run: |
+          sudo apt-get install iverilog
+
+      # -----------------------------------------------------------------------
+      #   Install baseline Poetry, check for caching, and then install our env.
+      # -----------------------------------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.1.2
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load Cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install library
+        run: poetry install --no-interaction
+
+      # -----------------------------------------------------------------------
+
+  continuous-deployment:
+    name: Deploys validated libray to PyPi and triggers light messaging.
+    needs: continuous-integration
+    runs-on: ubuntu-latest
+    steps:
+      # -----------------------------------------------------------------------
+      #   Check out the repository and setup our baseline Python environment
+      # -----------------------------------------------------------------------
+      - name: Checkout CelloAPI2 Repository
+        uses: actions/checkout@v2
+      # -----------------------------------------------------------------------
+      #   Bump the Version of the Repository via Poetry, and then publish.
+      # -----------------------------------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.1.2
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Bump library and Publish.
+        run: |
+          poetry build
+          poetry version patch
+          git add pyproject.toml
+          git config --global user.name 'CIDAR Deploy Bot'
+          git config --global user.email 'wrjackso@bu.edu'
+          git commit -am 'Automated Bump {CI/CD}'
+          git push
+          poetry publish --build -u ${{ secrets.pypi_username }} -p ${{ secrets.pypi_password }}
+
+      # -----------------------------------------------------------------------
+      #                   Let Jackson know everything is cool.
+      # -----------------------------------------------------------------------
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: general
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_MESSAGE: 'New Version of Syringe Pumps Deployed to Pypi :rocket:'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+
+
