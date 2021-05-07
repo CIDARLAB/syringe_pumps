@@ -1,4 +1,4 @@
-from syringe_pump.camera_control import XsCamera
+from syringe_pumps.camera_control import XsCamera
 
 # load the driver
 XsCamera.XsLoadDriver(0)
