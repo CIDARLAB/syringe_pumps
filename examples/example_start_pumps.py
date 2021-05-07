@@ -1,4 +1,4 @@
-import pump_code_pack
+from syringe_pump.pump_control import pump_code_pack
 import logging
 
 ##### add this to for logging functionality#####
@@ -14,11 +14,11 @@ sc_com4 = pump_code_pack.Serial_connection('COM4')
 
 # define first pump 
 address_1 = 0
-pump_2000_1 = pump_code_pack.Pump2000(sc_com4,address_1, name='PHD2000')
+pump_2000_1 = pump_code_pack.Pump2000(sc_com4, address_1, name='PHD2000')
 
 # define second pump 
 address_2 = 1
-pump_2000_2 = pump_code_pack.Pump2000(sc_com4,address_2, name='PHD2000')
+pump_2000_2 = pump_code_pack.Pump2000(sc_com4, address_2, name='PHD2000')
 
 
 ##### run first pump to  infuse indefinitely #####

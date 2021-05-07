@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "syringe_pumps"
+version = "0.1.0"
+description = "Library for the control of syringe pumps"
+authors = ["Diana Arguijo"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

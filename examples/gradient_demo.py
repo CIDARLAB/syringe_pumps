@@ -1,6 +1,4 @@
-import serial
-import logging
-import pump_code_pack
+from syringe_pump.pump_control import pump_code_pack
 import time 
 
 
@@ -12,13 +10,13 @@ def gradient(port, address_1, address_2, address_3, total_flow_rate, total_flow_
 	sc_com4 = pump_code_pack.Serial_connection(port)
 
 	# # define first pump 
-	pump_2000_1 = pump_code_pack.Pump2000(sc_com4,address_1, name='PHD2000_1')
+	pump_2000_1 = pump_code_pack.Pump2000(sc_com4, address_1, name='PHD2000_1')
 
 	# # define second pump 
-	pump_2000_2 = pump_code_pack.Pump2000(sc_com4,address_2, name='PHD2000_2')
+	pump_2000_2 = pump_code_pack.Pump2000(sc_com4, address_2, name='PHD2000_2')
 
 	# # define third pump 
-	pump_2000_3 = pump_code_pack.Pump2000(sc_com4,address_3, name='PHD2000_3')
+	pump_2000_3 = pump_code_pack.Pump2000(sc_com4, address_3, name='PHD2000_3')
 
 	sleep_time = 1
 	rounds_per_gradient = 20
