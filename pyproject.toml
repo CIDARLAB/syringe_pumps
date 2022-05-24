@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "syringe_pumps"
-version = "0.1.1"
+version = "0.1.2"
 description = "Library for the control of syringe pumps"
 authors = ["Diana Arguijo"]
 packages = [
